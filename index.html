@@ -1,4 +1,4 @@
-[16/4/2026 12:02 pm] Srihari: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -24,8 +24,8 @@ body {
 /* ── Chat Button ── */
 #chat-btn {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 18px;
+  right: 18px;
   z-index: 9999;
   width: 56px;
   height: 56px;
@@ -34,18 +34,15 @@ body {
   color: #fff;
   border: none;
   cursor: pointer;
+  font-size: 20px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-}
-
-#chat-btn:hover {
-  transform: scale(1.08);
 }
 
 /* ── Chat Panel ── */
 #chat-panel {
   position: fixed;
   bottom: 90px;
-  right: 20px;
+  right: 18px;
   width: 90%;
   max-width: 380px;
   height: 70vh;
@@ -62,7 +59,7 @@ body {
   display: flex;
 }
 
-/* Mobile fix */
+/* Mobile optimisation */
 @media (max-width: 600px) {
   #chat-panel {
     right: 0;
@@ -73,8 +70,8 @@ body {
   }
 
   #chat-btn {
-    bottom: 15px;
-    right: 15px;
+    bottom: 12px;
+    right: 12px;
   }
 }
 
@@ -186,10 +183,10 @@ body {
 
 <body>
 
-<!-- 🔥 Power BI AUTO LOAD -->
+<!-- 🔥 Power BI Embedded -->
 <iframe 
   id="dashboard-frame"
-  src="PASTE_YOUR_POWERBI_EMBED_URL_HERE"
+  src="https://app.powerbi.com/view?r=eyJrIjoiMjhjMDhhODMtNWI4YS00YjNjLTk2YTItNDJkOGU3YzJmYzYwIiwidCI6IjM0NzZiNzc2LWU5OTAtNGY3Mi1iOTUwLTYyNDg5ODMxNjIzZCIsImMiOjEwfQ%3D%3D"
   allowfullscreen>
 </iframe>
 
@@ -230,7 +227,6 @@ body {
         <option value="2">40ft</option>
       </select>
     </div>
-[16/4/2026 12:02 pm] Srihari: 
 
     <div class="form-row">
       <label>Laden</label>
