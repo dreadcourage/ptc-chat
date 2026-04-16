@@ -306,8 +306,8 @@ async function findSlot() {
       addCard(`Error: ${data.error}`, 'error-card');
     } else {
       addCard(
-        `<strong>${data.location}</strong><br>
-        Score: ${data.score}<br>
+         `<strong>${data.location}</strong><br>
+        Predicted Shift: ${data.predicted_shift}<br>
         Block: ${data.block} | Tier: ${data.tier}`,
         'result-card'
       );
