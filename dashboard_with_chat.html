@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PTC Yard Operations Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; height: 100vh; }
+
+  /* Dashboard iframe fills the whole screen */
+  #dashboard-frame {
+    width: 100%; height: 100vh; border: none;
+  }
+
+  /* Placeholder when no Power BI URL is set */
+  #placeholder {
+    width: 100%; height: 100vh;
+    background: #1e1e2e;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #94a3b8; font-size: 15px; gap: 16px;
+  }
+  #placeholder .title { font-size: 22px; font-weight: 600; color: #e2e8f0; }
+  #placeholder .sub { font-size: 13px; color: #64748b; max-width: 500px; text-align: center; line-height: 1.6; }
+  #placeholder input {
+    padding: 10px 16px; width: 500px; border-radius: 8px;
+    border: 1px solid #334155; background: #0f172a; color: #e2e8f0;
+    font-size: 14px; outline: none;
+  }
+  #placeholder input:focus { border-color: #3b82f6; }
+  #placeholder button {
+    padding: 10px 24px; background: #1a56db; color: #fff;
+    border: none; border-radius: 8px; font-size: 14px; cursor: pointer;
+  }
+
+  /* ── Chat widget styles ── */
+  #chat-btn {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #1a56db; color: #fff; border: none; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s;
+  }
+  #chat-btn:hover { transform: scale(1.08); }
+  #chat-btn svg { width: 26px; height: 26px; }
+
+  #chat-panel {
+    position: fixed; bottom: 92px; right: 24px; z-index: 9998;
+    width: 380px; max-height: 560px;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    display: none; flex-direction: column; overflow: hidden;
+  }
+  #chat-panel.open { display: flex; }
+
+  .chat-header {
+    background: #1a56db; color: #fff;
+    padding: 16px 20px; font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chat-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; }
+
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    max-height: 340px; min-height: 200px;
+  }
+
+  .msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; }
+  .msg.bot { background: #f3f4f6; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.user { background: #1a56db; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+  .result-card {
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+    padding: 14px; font-size: 13px; line-height: 1.8;
+    align-self: flex-start; max-width: 90%;
+  }
+  .result-card .label { color: #6b7280; font-size: 12px; }
+  .result-card .value { color: #1f2937; font-weight: 600; }
+  .result-card .loc { font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+
+  .error-card {
+    background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px;
+    padding: 14px; font-size: 13px; color: #991b1b;
+    align-self: flex-start; max-width: 90%;
+  }
+
+  .chat-form { padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 8px; }
+  .form-row { display: flex; gap: 8px; align-items: center; }
+  .form-row label { font-size: 12px; color: #6b7280; min-width: 70px; }
+  .form-row select, .form-row input {
+    flex: 1; padding: 6px 10px; border: 1px solid #d1d5db;
+    border-radius: 8px; font-size: 13px; background: #fff; outline: none;
+  }
+  .form-row select:focus, .form-row input:focus { border-color: #1a56db; }
+  #send-btn {
+    padding: 8px 16px; background: #1a56db; color: #fff;
+    border: none; border-radius: 8px; font-size: 13px;
+    font-weight: 600; cursor: pointer; align-self: flex-end;
+  }
+  #send-btn:disabled { background: #93a3b8; cursor: not-allowed; }
+
+  .loading { display: flex; gap: 4px; padding: 10px 14px; align-self: flex-start; }
+  .loading span {
+    width: 8px; height: 8px; border-radius: 50%; background: #9ca3af;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .loading span:nth-child(2) { animation-delay: 0.2s; }
+  .loading span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Dashboard area -->
+<div id="placeholder">
+  <div class="title">PTC Yard Operations Dashboard</div>
+  <div>Paste your Power BI embed URL below, or just use the chat widget on the right.</div>
+  <div class="sub">
+    To get the URL: open your Power BI report → File → Embed report → Website or portal → copy the iframe src URL.
+    <br>Or just leave this as-is and use the chat widget for the demo.
+  </div>
+  <input type="text" id="pbi-url" placeholder="Paste Power BI embed URL here...">
+  <button onclick="loadDashboard()">Load Dashboard</button>
+</div>
+
+<!-- Chat button -->
+<button id="chat-btn" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+
+<!-- Chat panel -->
+<div id="chat-panel">
+  <div class="chat-header">
+    <span class="dot"></span>
+    PTC Yard Optimiser
+  </div>
+  <div class="chat-messages" id="messages">
+    <div class="msg bot">
+      Hi! I can help you find the best slot for an incoming container. Fill in the details below and click <strong>Find Slot</strong>.
+    </div>
+  </div>
+  <div class="chat-form">
+    <div class="form-row">
+      <label>Yard</label>
+      <select id="in-yard">
+        <option value="One">Yard One</option>
+        <option value="Two">Yard Two</option>
+        <option value="Three">Yard Three</option>
+        <option value="R">Yard R</option>
+        <option value="M">Yard M</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Customer ID</label>
+      <input type="number" id="in-customer" value="17" min="1">
+    </div>
+    <div class="form-row">
+      <label>Size</label>
+      <select id="in-width">
+        <option value="1">20ft</option>
+        <option value="2">40ft</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Laden</label>
+      <select id="in-laden">
+        <option value="1">Laden (loaded)</option>
+        <option value="0">Empty</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>ETA (hours)</label>
+      <input type="number" id="in-eta" value="240" min="1">
+    </div>
+    <button id="send-btn" onclick="findSlot()">Find Slot</button>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://raking-freeload-canopy.ngrok-free.dev/solve';
+const messages = document.getElementById('messages');
+
+function loadDashboard() {
+  const url = document.getElementById('pbi-url').value.trim();
+  if (!url) return;
+  const placeholder = document.getElementById('placeholder');
+  const iframe = document.createElement('iframe');
+  iframe.id = 'dashboard-frame';
+  iframe.src = url;
+  iframe.style = 'width:100%;height:100vh;border:none;';
+  placeholder.replaceWith(iframe);
+}
+
+function toggleChat() {
+  document.getElementById('chat-panel').classList.toggle('open');
+}
+
+function addMsg(html, cls) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + cls;
+  div.innerHTML = html;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function addCard(html, cls) {
+  const div = document.createElement('div');
+  div.className = cls;
+  div.innerHTML = html;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function addLoading() {
+  const div = document.createElement('div');
+  div.className = 'loading'; div.id = 'loading';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function removeLoading() {
+  const el = document.getElementById('loading');
+  if (el) el.remove();
+}
+
+async function findSlot() {
+  const yard = document.getElementById('in-yard').value;
+  const customer = parseInt(document.getElementById('in-customer').value);
+  const width = parseInt(document.getElementById('in-width').value);
+  const laden = parseInt(document.getElementById('in-laden').value);
+  const eta = parseInt(document.getElementById('in-eta').value);
+
+  addMsg(
+    `Yard <strong>${yard}</strong> | Customer <strong>${customer}</strong><br>` +
+    `${width===1?'20ft':'40ft'} | ${laden===1?'Laden':'Empty'} | ETA: ${eta}h`,
+    'user'
+  );
+
+  addLoading();
+  document.getElementById('send-btn').disabled = true;
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ yard, customer_id: customer, width, laden, eta })
+    });
+    removeLoading();
+    const data = await resp.json();
+
+    if (data.error) {
+      addCard(`<strong>Error:</strong> ${data.error}`, 'error-card');
+    } else {
+      let partner = data.partner ? `<span class="label">Partner:</span> <span class="value">${data.partner}</span><br>` : '';
+      let prediction = '';
+      if (data.predicted_shift !== null && data.predicted_shift !== undefined) {
+        prediction = `<span class="label">Predicted reshuffles:</span> <span class="value">${data.predicted_shift.toFixed(2)}</span> <span class="label">(from ${data.historic_used} similar)</span><br>`;
+      } else if (data.historic_matched > 0) {
+        prediction = `<span class="label">Predicted reshuffles:</span> <span class="value">Not enough data</span><br>`;
+      }
+
+      addCard(
+        `<div class="loc">${data.location}</div>` +
+        `<span class="label">Yard:</span> <span class="value">${data.yard}</span><br>` +
+        `<span class="label">Type:</span> <span class="value">${data.container_type}</span><br>` +
+        partner +
+        `<span class="label">Block:</span> <span class="value">${data.block}</span> &nbsp; ` +
+        `<span class="label">Tier:</span> <span class="value">${data.tier}</span><br>` +
+        `<span class="label">Score:</span> <span class="value">${data.score}</span><br>` +
+        `<span class="label">Target tier:</span> <span class="value">${data.target_tier}</span><br>` +
+        `<span class="label">Laden adjusted:</span> <span class="value">${data.laden_applied ? 'Yes' : 'No'}</span><br>` +
+        `<span class="label">Customer grouping:</span> <span class="value">${data.customer_grouping ? 'Active' : 'No'}</span><br>` +
+        prediction +
+        `<span class="label">Candidates evaluated:</span> <span class="value">${data.total_candidates}</span>`,
+        'result-card'
+      );
+    }
+  } catch (e) {
+    removeLoading();
+    addCard(
+      `<strong>Connection failed</strong><br>Make sure Julia server is running:<br><code>julia milp_server.jl</code>`,
+      'error-card'
+    );
+  }
+  document.getElementById('send-btn').disabled = false;
+}
+</script>
+</body>
+</html>
