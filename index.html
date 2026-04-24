@@ -2,294 +2,462 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PTC Yard Operations Dashboard</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PTC · Yard Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  height: 100vh;
-  overflow: hidden;
+:root{
+  --ink:#0F0F10;
+  --ink-2:#1C1C1F;
+  --cream:#F6F2EB;
+  --cream-2:#FDFBF6;
+  --line:#E2DDD1;
+  --dust:#A9A196;
+  --stone:#5B5651;
+  --red:#D7261F;
+  --red-2:#B01C15;
+  --red-hi:#FF8A83;
+  --green:#1FBF75;
+  --vh:100vh;
+  --vh:100dvh;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{
+  height:var(--vh);overflow:hidden;
+  background:var(--cream);color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 }
 
-/* ── Dashboard ── */
-#dashboard-frame {
-  width: 100%;
-  height: 100vh;
-  border: none;
+/* ================= FLOATING GLASS NAV ================= */
+.nav{
+  position:fixed;top:14px;left:14px;right:14px;z-index:50;
+  height:58px;padding:0 20px;border-radius:999px;
+  background:rgba(15,15,16,.9);
+  backdrop-filter:saturate(140%) blur(18px);
+  -webkit-backdrop-filter:saturate(140%) blur(18px);
+  color:var(--cream);
+  display:flex;align-items:center;gap:18px;
+  box-shadow:0 10px 30px rgba(15,15,16,.22),0 1px 0 rgba(255,255,255,.05) inset;
+}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.mark{
+  width:38px;height:38px;background:var(--red);border-radius:10px;
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:10px;letter-spacing:.16em;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.22),0 2px 8px rgba(215,38,31,.32);
+}
+.wordmark{display:flex;flex-direction:column;line-height:1.05}
+.w1{font-family:'Fraunces',serif;font-weight:600;font-size:16px;letter-spacing:-.015em}
+.w1 em{font-style:italic;color:var(--dust);font-weight:500}
+.w2{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dust);letter-spacing:.24em;text-transform:uppercase;margin-top:3px}
+
+.nav-sep{width:1px;height:24px;background:rgba(255,255,255,.1)}
+.nav-tag{
+  display:flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dust);
+  letter-spacing:.14em;text-transform:uppercase;
+}
+.nav-tag kbd{
+  font-family:inherit;font-size:9px;padding:3px 7px;border-radius:5px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+  color:var(--cream);letter-spacing:.1em;
+}
+.nav-live{
+  margin-left:auto;display:flex;align-items:center;gap:9px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dust);
+  text-transform:uppercase;letter-spacing:.22em;
+}
+.dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(31,191,117,.55)}70%{box-shadow:0 0 0 8px rgba(31,191,117,0)}100%{box-shadow:0 0 0 0 rgba(31,191,117,0)}}
+
+/* ================= DASHBOARD STAGE ================= */
+.stage{
+  position:fixed;top:86px;left:14px;right:14px;bottom:14px;
+  border-radius:18px;overflow:hidden;background:var(--cream-2);
+  box-shadow:0 8px 28px rgba(15,15,16,.08),0 0 0 1px var(--line);
+}
+#dashboard-frame{width:100%;height:100%;border:0;display:block;background:var(--cream-2)}
+
+/* ================= CHAT BUTTON ================= */
+#chat-btn{
+  position:fixed;bottom:calc(30px + env(safe-area-inset-bottom,0));right:30px;z-index:9999;
+  height:60px;padding:0 26px 0 8px;border:0;cursor:pointer;
+  background:var(--ink);color:var(--cream);border-radius:999px;
+  display:flex;align-items:center;gap:14px;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:15px;letter-spacing:-.01em;
+  box-shadow:
+    0 14px 36px rgba(15,15,16,.34),
+    0 2px 6px rgba(15,15,16,.2),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,background .22s;
+}
+#chat-btn:hover{transform:translateY(-3px);background:var(--ink-2);box-shadow:0 20px 44px rgba(15,15,16,.38)}
+#chat-btn:active{transform:translateY(-1px)}
+#chat-btn.hidden{display:none}
+#chat-btn .chip{
+  width:44px;height:44px;background:var(--red);border-radius:50%;
+  display:grid;place-items:center;font-weight:800;font-size:11px;letter-spacing:.14em;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.22);
+}
+#chat-btn .label em{font-style:italic;color:var(--red-hi);font-weight:500}
+
+/* ================= CHAT PANEL ================= */
+#chat-panel{
+  position:fixed;bottom:30px;right:30px;z-index:9998;
+  width:430px;max-height:calc(var(--vh) - 120px);
+  background:var(--cream-2);border-radius:26px;overflow:hidden;
+  box-shadow:0 40px 80px rgba(15,15,16,.34),0 0 0 1px rgba(15,15,16,.06);
+  display:none;flex-direction:column;
+  opacity:0;transform:translateY(14px) scale(.97);
+  transition:opacity .26s cubic-bezier(.2,.8,.3,1),transform .26s cubic-bezier(.2,.8,.3,1);
+}
+#chat-panel.open{display:flex;opacity:1;transform:none}
+
+.ch-head{
+  position:relative;overflow:hidden;flex-shrink:0;
+  background:var(--ink);color:var(--cream);
+  padding:24px 24px 22px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+}
+.ch-head::before{
+  content:'';position:absolute;top:-70px;right:-70px;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(215,38,31,.26),transparent 62%);
+  pointer-events:none;
+}
+.ch-head::after{
+  content:'';position:absolute;bottom:-50px;left:-30px;width:160px;height:160px;
+  background:radial-gradient(circle,rgba(31,191,117,.1),transparent 65%);
+  pointer-events:none;
+}
+.ch-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--dust);margin-bottom:8px}
+.ch-title{font-family:'Fraunces',serif;font-weight:600;font-size:24px;letter-spacing:-.02em;line-height:1.1}
+.ch-title em{font-style:italic;color:var(--red-hi);font-weight:500}
+.ch-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dust);margin-top:7px}
+.ch-close{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  color:var(--dust);cursor:pointer;
+  width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  font-size:18px;line-height:1;transition:background .15s,color .15s;z-index:1;flex-shrink:0;
+}
+.ch-close:hover{background:rgba(255,255,255,.14);color:var(--cream)}
+
+.ch-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:20px 24px;display:flex;flex-direction:column;gap:12px;
+  background:var(--cream-2);min-height:120px;max-height:340px;
+}
+.ch-body::-webkit-scrollbar{width:5px}
+.ch-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+.msg{padding:11px 15px;border-radius:15px;font-size:13.5px;line-height:1.5;max-width:88%}
+.msg.bot{
+  background:var(--cream);color:var(--ink);align-self:flex-start;
+  border-bottom-left-radius:5px;border:1px solid var(--line);
+}
+.msg.user{
+  background:var(--ink);color:var(--cream);align-self:flex-end;
+  border-bottom-right-radius:5px;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.03em;
 }
 
-/* ── Chat Button ── */
-#chat-btn {
-  position: fixed;
-  bottom: 18px;
-  right: 18px;
-  z-index: 9999;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #1a56db;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-size: 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+.result{
+  background:var(--cream-2);border:1px solid var(--line);border-radius:16px;
+  overflow:hidden;animation:riseIn .34s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.r-head{
+  background:var(--ink);color:var(--dust);
+  padding:13px 17px;display:flex;justify-content:space-between;align-items:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+}
+.r-tag{
+  background:var(--red);color:#fff;
+  padding:3px 10px;border-radius:5px;
+  font-size:9px;font-weight:700;letter-spacing:.16em;
+}
+.r-body{padding:18px 18px}
+.r-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--dust);margin-bottom:5px}
+.r-loc{
+  font-family:'Fraunces',serif;font-weight:700;font-size:36px;letter-spacing:-.03em;
+  color:var(--ink);line-height:1;margin-bottom:7px;
+}
+.r-sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--stone);margin-bottom:16px}
+.r-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line);border-radius:11px;overflow:hidden;border:1px solid var(--line);
+}
+.r-cell{background:var(--cream);padding:12px 14px}
+.r-cell .k{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dust);letter-spacing:.22em;text-transform:uppercase;margin-bottom:4px}
+.r-cell .v{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1}
+.r-cell.hl{background:#FFF3F2}
+.r-cell.hl .v{color:var(--red)}
+
+.err{
+  background:#FEF2F2;border:1px solid #F9C8C4;border-left:3px solid var(--red);
+  border-radius:12px;padding:13px 16px;color:var(--red-2);font-size:13px;line-height:1.5;
+}
+.err strong{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:5px;color:var(--red)}
+
+/* ================= FORM ================= */
+.ch-form{
+  padding:16px 20px 20px;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,var(--cream) 0%,var(--cream-2) 100%);
+  flex-shrink:0;
+}
+.form-title{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--stone);margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.form-title .cnt{font-size:9px;color:var(--dust)}
+.presets{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.preset{
+  background:var(--cream-2);border:1px solid var(--line);color:var(--stone);
+  padding:5px 11px;border-radius:999px;font-size:11px;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;letter-spacing:.04em;
+  transition:background .15s,border-color .15s,color .15s,transform .1s;
+}
+.preset:hover{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.preset:active{transform:scale(.97)}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld.full{grid-column:1/-1}
+.fld label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--stone)}
+.fld input,.fld select{
+  padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  background:var(--cream-2);font-family:'Inter',sans-serif;font-size:16px;color:var(--ink);
+  transition:border-color .15s,box-shadow .15s,background .15s;width:100%;
+}
+@media(min-width:601px){.fld input,.fld select{font-size:13.5px}}
+.fld input:focus,.fld select:focus{
+  outline:0;border-color:var(--ink);
+  box-shadow:0 0 0 3px rgba(15,15,16,.08);background:#fff;
+}
+.fld select{
+  appearance:none;padding-right:32px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235B5651' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
 }
 
-/* ── Chat Panel ── */
-#chat-panel {
-  position: fixed;
-  bottom: 90px;
-  right: 18px;
-  width: 90%;
-  max-width: 380px;
-  height: 70vh;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-  display: none;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 9998;
+#send-btn{
+  width:100%;padding:14px;background:var(--ink);color:var(--cream);border:0;border-radius:12px;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background .15s,transform .1s,box-shadow .15s;
+  box-shadow:0 4px 14px rgba(15,15,16,.2);
 }
+#send-btn:hover{background:var(--ink-2);box-shadow:0 6px 20px rgba(15,15,16,.26)}
+#send-btn:active{transform:scale(.99)}
+#send-btn:disabled{background:var(--dust);cursor:not-allowed;box-shadow:none}
+#send-btn .arr{font-family:'Fraunces',serif;font-style:italic;color:var(--red-hi);font-weight:600;font-size:15px}
 
-#chat-panel.open {
-  display: flex;
-}
+/* ================= LOADING ================= */
+.loading{display:flex;gap:6px;padding:12px 16px;align-self:flex-start}
+.loading span{width:8px;height:8px;background:var(--dust);border-radius:50%;animation:bounce 1.2s infinite}
+.loading span:nth-child(2){animation-delay:.15s}
+.loading span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1;background:var(--red)}}
 
-/* Mobile optimisation */
-@media (max-width: 600px) {
-  #chat-panel {
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 85vh;
-    border-radius: 16px 16px 0 0;
+/* ================= RESPONSIVE ================= */
+@media (max-width:760px){.nav-tag,.nav-sep{display:none}}
+
+/* Mobile portrait */
+@media (max-width:600px) and (orientation:portrait){
+  .nav{top:10px;left:10px;right:10px;height:52px;padding:0 14px}
+  .w2{display:none}
+  .stage{top:72px;left:10px;right:10px;bottom:10px;border-radius:14px}
+  #chat-btn{bottom:calc(16px + env(safe-area-inset-bottom,0));right:16px;height:52px;padding:0 22px 0 6px;font-size:14px}
+  #chat-btn .chip{width:40px;height:40px}
+  #chat-panel{
+    right:0;left:0;bottom:0;width:100%;
+    max-height:90dvh;border-radius:26px 26px 0 0;
+    padding-bottom:env(safe-area-inset-bottom,0);
   }
-
-  #chat-btn {
-    bottom: 12px;
-    right: 12px;
-  }
+  .ch-body{max-height:none;flex:1}
+  .r-loc{font-size:30px}
 }
 
-/* ── Chat UI ── */
-.chat-header {
-  background: #1a56db;
-  color: #fff;
-  padding: 14px;
-  font-weight: 600;
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.msg {
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  max-width: 85%;
-}
-
-.msg.bot {
-  background: #f3f4f6;
-  align-self: flex-start;
-}
-
-.msg.user {
-  background: #1a56db;
-  color: white;
-  align-self: flex-end;
-}
-
-.result-card {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 13px;
-}
-
-.error-card {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 10px;
-  padding: 12px;
-  color: #991b1b;
-}
-
-/* ── Form ── */
-.chat-form {
-  padding: 10px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.form-row {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.form-row label {
-  font-size: 12px;
-  width: 70px;
-}
-
-.form-row input, .form-row select {
-  flex: 1;
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-#send-btn {
-  width: 100%;
-  padding: 8px;
-  background: #1a56db;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-/* ── Loading ── */
-.loading {
-  display: flex;
-  gap: 4px;
-}
-
-.loading span {
-  width: 8px;
-  height: 8px;
-  background: #9ca3af;
-  border-radius: 50%;
-  animation: bounce 1.2s infinite;
-}
-
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0.6); }
-  40% { transform: scale(1); }
+/* Mobile landscape */
+@media (max-height:500px) and (orientation:landscape){
+  .nav{top:8px;left:8px;right:8px;height:44px;padding:0 12px}
+  .mark{width:30px;height:30px;border-radius:7px;font-size:9px}
+  .w1{font-size:14px}
+  .w2{display:none}
+  .stage{top:58px;left:8px;right:8px;bottom:8px;border-radius:12px}
+  #chat-btn{bottom:10px;right:10px;height:42px;padding:0 16px 0 4px;font-size:12px;gap:8px}
+  #chat-btn .chip{width:34px;height:34px;font-size:9px}
+  #chat-panel{right:10px;bottom:10px;top:56px;width:min(410px,56%);max-height:calc(var(--vh) - 66px);border-radius:18px}
+  .ch-head{padding:14px 18px 12px}
+  .ch-title{font-size:17px}
+  .ch-meta,.ch-eyebrow{display:none}
+  .ch-body{padding:12px 18px;min-height:50px;max-height:none}
+  .ch-form{padding:12px 16px 14px}
+  .presets{margin-bottom:8px}
+  .grid{gap:7px;margin-bottom:9px}
+  .fld input,.fld select{padding:8px 10px;font-size:13px}
+  #send-btn{padding:11px;font-size:12.5px}
+  .r-loc{font-size:26px}
 }
 </style>
 </head>
-
 <body>
 
-<!-- 🔥 Power BI Embedded -->
-<iframe 
-  id="dashboard-frame"
-  src="https://app.powerbi.com/view?r=eyJrIjoiMjhjMDhhODMtNWI4YS00YjNjLTk2YTItNDJkOGU3YzJmYzYwIiwidCI6IjM0NzZiNzc2LWU5OTAtNGY3Mi1iOTUwLTYyNDg5ODMxNjIzZCIsImMiOjEwfQ%3D%3D"
-  allowfullscreen>
-</iframe>
-
-<!-- Chat Button -->
-<button id="chat-btn" onclick="toggleChat()">💬</button>
-
-<!-- Chat Panel -->
-<div id="chat-panel">
-  <div class="chat-header">PTC Yard Optimiser</div>
-
-  <div class="chat-messages" id="messages">
-    <div class="msg bot">
-      Hi! I’ll find the best slot for your container.
+<header class="nav">
+  <a class="brand" href="#">
+    <div class="mark">PTC</div>
+    <div class="wordmark">
+      <span class="w1">Yard <em>Operations</em></span>
+      <span class="w2">MILP · Live Demo</span>
     </div>
+  </a>
+  <div class="nav-sep"></div>
+  <div class="nav-tag">
+    <kbd>DBA</kbd>
+    <span>Showcase 2026</span>
+  </div>
+  <div class="nav-live"><span class="dot"></span><span>Solver Online</span></div>
+</header>
+
+<main class="stage">
+  <iframe id="dashboard-frame"
+    src="https://app.powerbi.com/view?r=eyJrIjoiMjhjMDhhODMtNWI4YS00YjNjLTk2YTItNDJkOGU3YzJmYzYwIiwidCI6IjM0NzZiNzc2LWU5OTAtNGY3Mi1iOTUwLTYyNDg5ODMxNjIzZCIsImMiOjEwfQ%3D%3D"
+    allowfullscreen></iframe>
+</main>
+
+<button id="chat-btn" onclick="toggleChat()" aria-label="Open slot recommender">
+  <div class="chip">PTC</div>
+  <span class="label">Find a <em>slot</em></span>
+</button>
+
+<div id="chat-panel" role="dialog" aria-labelledby="ch-title">
+  <div class="ch-head">
+    <div>
+      <div class="ch-eyebrow">MILP Solver · Real-time</div>
+      <div class="ch-title" id="ch-title">Slot <em>recommender</em></div>
+    </div>
+    <button class="ch-close" onclick="toggleChat()" aria-label="Close">×</button>
   </div>
 
-  <div class="chat-form">
-    <div class="form-row">
-      <label>Yard</label>
-      <select id="in-yard">
-        <option value="One">One</option>
-        <option value="Two">Two</option>
-        <option value="Three">Three</option>
-        <option value="R">R</option>
-        <option value="M">M</option>
-      </select>
+  <div class="ch-body" id="messages">
+    <div class="msg bot">Set the container parameters below and I'll return the optimal yard slot with predicted shifts.</div>
+  </div>
+
+  <div class="ch-form">
+    <div class="form-title"><span>Container Parameters</span><span class="cnt">5 inputs</span></div>
+
+    <div class="grid">
+      <div class="fld">
+        <label>Yard</label>
+        <select id="in-yard">
+          <option value="One">One</option>
+          <option value="Two">Two</option>
+          <option value="Three">Three</option>
+          <option value="R">R</option>
+          <option value="M">M</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Customer ID</label>
+        <input type="number" id="in-customer" value="17">
+      </div>
+      <div class="fld">
+        <label>Size</label>
+        <select id="in-width">
+          <option value="1">20 ft</option>
+          <option value="2">40 ft</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Laden</label>
+        <select id="in-laden">
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="fld full">
+        <label>ETA (hours)</label>
+        <input type="number" id="in-eta" value="240">
+      </div>
     </div>
 
-    <div class="form-row">
-      <label>Cust</label>
-      <input type="number" id="in-customer" value="17">
-    </div>
-
-    <div class="form-row">
-      <label>Size</label>
-      <select id="in-width">
-        <option value="1">20ft</option>
-        <option value="2">40ft</option>
-      </select>
-    </div>
-
-    <div class="form-row">
-      <label>Laden</label>
-      <select id="in-laden">
-        <option value="1">Yes</option>
-        <option value="0">No</option>
-      </select>
-    </div>
-
-    <div class="form-row">
-      <label>ETA</label>
-      <input type="number" id="in-eta" value="240">
-    </div>
-
-    <button id="send-btn" onclick="findSlot()">Find Slot</button>
+    <button id="send-btn" onclick="findSlot()">
+      <span>Find optimal slot</span>
+      <span class="arr">→</span>
+    </button>
   </div>
 </div>
 
 <script>
 const API_URL = 'https://raking-freeload-canopy.ngrok-free.dev/solve';
 const messages = document.getElementById('messages');
+const chatBtn = document.getElementById('chat-btn');
+const chatPanel = document.getElementById('chat-panel');
 
-function toggleChat() {
-  document.getElementById('chat-panel').classList.toggle('open');
+function toggleChat(){
+  const isOpen = chatPanel.classList.toggle('open');
+  chatBtn.classList.toggle('hidden', isOpen);
 }
 
-function addMsg(text, cls) {
-  const div = document.createElement('div');
-  div.className = 'msg ' + cls;
-  div.innerHTML = text;
-  messages.appendChild(div);
+function preset(y,c,w,l,e){
+  document.getElementById('in-yard').value = y;
+  document.getElementById('in-customer').value = c;
+  document.getElementById('in-width').value = w;
+  document.getElementById('in-laden').value = l;
+  document.getElementById('in-eta').value = e;
+}
+
+function addMsg(text, cls){
+  const d = document.createElement('div');
+  d.className = 'msg ' + cls;
+  d.innerHTML = text;
+  messages.appendChild(d);
   messages.scrollTop = messages.scrollHeight;
 }
 
-function addCard(html, cls) {
-  const div = document.createElement('div');
-  div.className = cls;
-  div.innerHTML = html;
-  messages.appendChild(div);
+function addCard(html, cls){
+  const d = document.createElement('div');
+  d.className = cls;
+  d.innerHTML = html;
+  messages.appendChild(d);
   messages.scrollTop = messages.scrollHeight;
 }
 
-function addLoading() {
-  const div = document.createElement('div');
-  div.className = 'loading';
-  div.id = 'loading';
-  div.innerHTML = '<span></span><span></span><span></span>';
-  messages.appendChild(div);
+function addLoading(){
+  const d = document.createElement('div');
+  d.className = 'loading';
+  d.id = 'loading';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  messages.appendChild(d);
+  messages.scrollTop = messages.scrollHeight;
 }
 
-function removeLoading() {
+function removeLoading(){
   const el = document.getElementById('loading');
   if (el) el.remove();
 }
 
-async function findSlot() {
+document.querySelectorAll('.fld input, .fld select').forEach(el => {
+  el.addEventListener('focus', () => {
+    setTimeout(() => el.scrollIntoView({behavior:'smooth', block:'center'}), 300);
+  });
+});
+
+async function findSlot(){
   const yard = document.getElementById('in-yard').value;
   const customer = parseInt(document.getElementById('in-customer').value);
   const width = parseInt(document.getElementById('in-width').value);
   const laden = parseInt(document.getElementById('in-laden').value);
   const eta = parseInt(document.getElementById('in-eta').value);
 
-  addMsg(`Yard ${yard} | Cust ${customer}`, 'user');
+  const sizeLabel = width === 1 ? '20ft' : '40ft';
+  const ladenLabel = laden === 1 ? 'laden' : 'empty';
+  addMsg(`Yard ${yard} · Cust ${customer} · ${sizeLabel} ${ladenLabel} · ETA ${eta}h`, 'user');
+
+  const sendBtn = document.getElementById('send-btn');
+  sendBtn.disabled = true;
   addLoading();
 
   try {
@@ -298,24 +466,32 @@ async function findSlot() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ yard, customer_id: customer, width, laden, eta })
     });
-
     const data = await resp.json();
     removeLoading();
 
-    if (data.error) {
-      addCard(`Error: ${data.error}`, 'error-card');
+    if (data.error){
+      addCard(`<strong>Solver error</strong>${data.error}`, 'err');
     } else {
-      addCard(
-         `<strong>${data.location}</strong><br>
-        Predicted Shift: ${data.predicted_shift}<br>
-        Block: ${data.block} | Tier: ${data.tier}`,
-        'result-card'
-      );
+      const pred = data.predicted_shift != null ? Number(data.predicted_shift).toFixed(2) : '—';
+      addCard(`
+        <div class="r-head"><span>Recommended slot</span><span class="r-tag">OPTIMAL</span></div>
+        <div class="r-body">
+          <div class="r-eyebrow">Location</div>
+          <div class="r-loc">${data.location}</div>
+          <div class="r-sub">Block ${data.block} · Tier ${data.tier}</div>
+          <div class="r-grid">
+            <div class="r-cell hl"><div class="k">Shifts</div><div class="v">${pred}</div></div>
+            <div class="r-cell"><div class="k">Block</div><div class="v">${data.block}</div></div>
+            <div class="r-cell"><div class="k">Tier</div><div class="v">${data.tier}</div></div>
+          </div>
+        </div>
+      `, 'result');
     }
-
   } catch {
     removeLoading();
-    addCard(`Connection failed`, 'error-card');
+    addCard(`<strong>Connection failed</strong>Could not reach the MILP solver. Ensure ngrok is running and retry.`, 'err');
+  } finally {
+    sendBtn.disabled = false;
   }
 }
 </script>
