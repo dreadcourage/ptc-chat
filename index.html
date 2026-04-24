@@ -305,14 +305,14 @@ body {
 
 .result-card .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   gap: 8px;
 }
 .result-card .stat {
   background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 10px 8px;
+  padding: 10px 10px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -330,14 +330,37 @@ body {
 }
 .result-card .stat .v {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--brand-2);
   letter-spacing: -0.01em;
   line-height: 1.1;
   word-break: break-all;
 }
-.result-card .stat.hero .v { color: var(--ink); font-size: 20px; }
+.result-card .stat.hero {
+  background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(37,99,235,0.02));
+  border-color: rgba(37,99,235,0.25);
+  padding: 8px 12px;
+}
+.result-card .stat.hero .k { color: var(--brand-2); }
+.result-card .stat.hero .v { color: var(--ink); font-size: 24px; margin-bottom: 2px; }
+.result-card .stat.hero .sub {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.result-card .stat.hero .sub b {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--brand-2);
+  font-size: 12px;
+  font-weight: 700;
+}
 
 /* ── Error card ── */
 .error-card {
@@ -508,72 +531,91 @@ body {
   .chat-header .header-icon { width: 34px; height: 34px; }
   .chat-header .title { font-size: 14.5px; }
 
-  .result-card .stat .v { font-size: 17px; }
-  .result-card .stat.hero .v { font-size: 19px; }
+  .result-card .stat .v { font-size: 19px; }
+  .result-card .stat.hero .v { font-size: 22px; }
+  .result-card .stat.hero .sub { font-size: 10px; }
+  .result-card .stat.hero .sub b { font-size: 11.5px; }
 }
 
 /* ── Mobile LANDSCAPE (short screen, rotated phone) ── */
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 560px) {
   #chat-panel {
-    top: 10px;
-    bottom: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     left: auto;
-    width: 58%;
-    max-width: 460px;
-    height: auto;
-    max-height: calc(100vh - 20px);
-    max-height: calc(100dvh - 20px);
-    border-radius: 16px;
+    bottom: auto;
+    width: 54%;
+    max-width: 480px;
+    height: calc(100vh - 16px);
+    height: calc(100dvh - 16px);
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
   }
   #chat-btn {
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    right: calc(10px + env(safe-area-inset-right, 0px));
-    width: 52px; height: 52px;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    width: 48px; height: 48px;
   }
-  #chat-btn svg { width: 22px; height: 22px; }
+  #chat-btn svg { width: 20px; height: 20px; }
+  #chat-btn .status-dot { width: 11px; height: 11px; top: 2px; right: 2px; border-width: 2px; }
 
   .chat-header {
-    padding: 10px 14px;
+    padding: 8px 12px;
   }
-  .chat-header .header-icon { width: 32px; height: 32px; }
-  .chat-header .header-icon svg { width: 17px; height: 17px; }
-  .chat-header .title { font-size: 13.5px; }
-  .chat-header .subtitle { font-size: 10.5px; }
+  .chat-header .header-icon { width: 28px; height: 28px; border-radius: 8px; }
+  .chat-header .header-icon svg { width: 15px; height: 15px; }
+  .chat-header .title { font-size: 12.5px; }
+  .chat-header .subtitle { font-size: 10px; margin-top: 1px; }
+  .chat-header .close-btn { width: 26px; height: 26px; font-size: 15px; }
 
   .chat-messages {
-    padding: 10px 12px;
-    gap: 8px;
+    padding: 8px 10px;
+    gap: 6px;
+    min-height: 0;
   }
-  .msg { font-size: 12.5px; padding: 8px 12px; }
+  .msg { font-size: 12px; padding: 7px 11px; border-radius: 10px; }
 
-  .result-card { padding: 10px; }
-  .result-card .tag { margin-bottom: 8px; padding: 2px 7px; font-size: 10px; }
-  .result-card .stats { gap: 6px; }
-  .result-card .stat { padding: 7px 5px; min-height: 58px; }
-  .result-card .stat .k { font-size: 9px; margin-bottom: 2px; }
+  .result-card { padding: 8px 10px; }
+  .result-card .tag { margin-bottom: 6px; padding: 2px 6px; font-size: 9.5px; }
+  .result-card .stats { gap: 5px; }
+  .result-card .stat { padding: 5px 6px; min-height: 48px; border-radius: 8px; }
+  .result-card .stat .k { font-size: 8.5px; margin-bottom: 1px; }
   .result-card .stat .v { font-size: 15px; }
-  .result-card .stat.hero .v { font-size: 16px; }
+  .result-card .stat.hero { padding: 5px 8px; }
+  .result-card .stat.hero .v { font-size: 17px; margin-bottom: 0; }
+  .result-card .stat.hero .sub { font-size: 9px; }
+  .result-card .stat.hero .sub b { font-size: 10px; }
 
-  .chat-form { padding: 10px 12px 12px; }
+  .chat-form { padding: 8px 10px 10px; }
   .form-grid {
-    /* 3 columns to keep form height short */
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 6px 8px;
-    margin-bottom: 8px;
+    /* 4 columns: all 4 dropdowns fit on one row, ETA full-width below */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px 6px;
+    margin-bottom: 6px;
   }
   .field.full { grid-column: 1 / -1; }
-  .field label { font-size: 9.5px; }
+  .field { gap: 2px; }
+  .field label {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
   .field input,
   .field select {
-    padding: 7px 8px 7px 28px;
-    font-size: 14px;
-    border-radius: 7px;
+    padding: 6px 6px 6px 24px;
+    font-size: 13px;
+    border-radius: 6px;
   }
-  .field .input-wrap svg { width: 12px; height: 12px; left: 8px; }
+  .field select { padding-right: 18px; background-position: right 4px center; }
+  .field .input-wrap svg { width: 11px; height: 11px; left: 6px; }
 
-  #send-btn { padding: 9px; font-size: 13px; border-radius: 8px; }
-  #send-btn svg { width: 14px; height: 14px; }
+  #send-btn {
+    padding: 8px;
+    font-size: 12.5px;
+    border-radius: 7px;
+    gap: 6px;
+  }
+  #send-btn svg { width: 13px; height: 13px; }
 }
 
 /* ── Very short screens (phones with split-screen, tiny laptops) ── */
@@ -735,9 +777,9 @@ function addResultCard(data) {
   const card = document.createElement('div');
   card.className = 'result-card';
 
-  // Only show Yard, Block, and Predicted Shift Count
-  const yardVal  = data.yard ?? '—';
-  const blockVal = data.block ?? '—';
+  // Only show Yard, Location (block+col+tier) and Predicted Shift Count
+  const yardVal = data.yard ?? '—';
+  const locVal  = data.location ?? data.block ?? '—';
   const shiftVal = (data.predicted_shift !== null && data.predicted_shift !== undefined)
     ? Number(data.predicted_shift).toFixed(2)
     : 'N/A';
@@ -746,8 +788,11 @@ function addResultCard(data) {
     `<div class="tag">Optimal placement</div>` +
     `<div class="stats">` +
       `<div class="stat"><div class="k">Yard</div><div class="v">${yardVal}</div></div>` +
-      `<div class="stat hero"><div class="k">Block</div><div class="v">${blockVal}</div></div>` +
-      `<div class="stat"><div class="k">Pred. Shift</div><div class="v">${shiftVal}</div></div>` +
+      `<div class="stat hero">` +
+        `<div class="k">Loc</div>` +
+        `<div class="v">${locVal}</div>` +
+        `<div class="sub">Pred. shift <b>${shiftVal}</b></div>` +
+      `</div>` +
     `</div>`;
 
   messages.appendChild(card);
